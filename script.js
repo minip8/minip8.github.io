@@ -10,7 +10,7 @@ const posts = [
   {
     slug: 'hello',
     title: 'Hello',
-    date: '08-04-2026',
+    date: '2026-04-08',
     categories: ['hello', 'world'],
     excerpt: 'Hello world',
     path: 'content/projects/hello/index.md',
@@ -67,7 +67,24 @@ function escapeHtml(value) {
 }
 
 function formatDate(value) {
-  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value));
+  const parsed = new Date(value);
+  if (!Number.isNaN(parsed.getTime())) {
+    return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(parsed);
+  }
+
+  // Fallback for legacy m-d-yyyy or mm-dd-yyyy values across strict mobile parsers.
+  const fallbackMatch = /^([0-1]?\d)-([0-3]?\d)-(\d{4})$/.exec(String(value));
+  if (fallbackMatch) {
+    const month = Number(fallbackMatch[1]);
+    const day = Number(fallbackMatch[2]);
+    const year = Number(fallbackMatch[3]);
+    const fallbackDate = new Date(year, month - 1, day);
+    if (!Number.isNaN(fallbackDate.getTime())) {
+      return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(fallbackDate);
+    }
+  }
+
+  return String(value);
 }
 
 function homePage() {
