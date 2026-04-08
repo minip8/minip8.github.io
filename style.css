@@ -162,6 +162,16 @@ code,
   max-width: 56ch;
 }
 
+.app > .intro:not(.intro-tight) {
+  max-width: none;
+}
+
+.app > .intro:not(.intro-tight) h1,
+.app > .intro:not(.intro-tight) .intro-copy,
+.app > .about-card p {
+  max-width: none;
+}
+
 .eyebrow {
   margin: 0;
   color: var(--soft);
@@ -323,6 +333,10 @@ code,
   color: var(--text);
   line-height: 1.84;
   max-width: 72ch;
+}
+
+.project-content .markdown-body {
+  max-width: none;
 }
 
 .link-list {
