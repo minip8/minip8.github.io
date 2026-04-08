@@ -1,240 +1,207 @@
-/* jshint esversion: 9 */
 'use strict';
 
-const GITHUB_USERNAME = 'minip8';
+const app = document.getElementById('app');
+const themeToggle = document.getElementById('theme-toggle');
 
-// =====================================================================
-// NAVBAR — scroll state
-// =====================================================================
-const navbar = document.getElementById('navbar');
+const themeMedia = window.matchMedia('(prefers-color-scheme: dark)');
+const THEME_STORAGE_KEY = 'minip8-theme';
 
-window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 50);
-}, { passive: true });
+const posts = [
+  {
+    slug: 'hello',
+    title: 'Hello',
+    date: '08-04-2026',
+    categories: ['hello', 'world'],
+    excerpt: 'Hello world',
+    path: 'content/projects/hello/index.md',
+  },
+];
 
-// =====================================================================
-// HAMBURGER — mobile menu
-// =====================================================================
-const hamburger = document.getElementById('hamburger');
-const navLinks  = document.getElementById('nav-links');
+function setTheme(theme) {
+  const resolvedTheme = theme === 'dark' ? 'dark' : 'light';
+  document.documentElement.dataset.theme = resolvedTheme;
+  localStorage.setItem(THEME_STORAGE_KEY, resolvedTheme);
+  document.documentElement.style.colorScheme = resolvedTheme;
+  if (themeToggle) {
+    themeToggle.textContent = resolvedTheme === 'dark' ? 'Light' : 'Dark';
+    themeToggle.setAttribute('aria-label', `Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`);
+  }
+  const themeColor = resolvedTheme === 'dark' ? '#111111' : '#ffffff';
+  const metaThemeColor = document.querySelector('meta[name="theme-color"]');
+  if (metaThemeColor) {
+    metaThemeColor.setAttribute('content', themeColor);
+  }
+}
 
-hamburger.addEventListener('click', () => {
-  const isOpen = navLinks.classList.toggle('open');
-  hamburger.classList.toggle('active', isOpen);
-  hamburger.setAttribute('aria-expanded', isOpen);
-  document.body.style.overflow = isOpen ? 'hidden' : '';
+function getPreferredTheme() {
+  const storedTheme = localStorage.getItem(THEME_STORAGE_KEY);
+  if (storedTheme === 'light' || storedTheme === 'dark') {
+    return storedTheme;
+  }
+
+  return themeMedia.matches ? 'dark' : 'light';
+}
+
+setTheme(getPreferredTheme());
+
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+  });
+}
+
+themeMedia.addEventListener('change', (event) => {
+  if (!localStorage.getItem(THEME_STORAGE_KEY)) {
+    setTheme(event.matches ? 'dark' : 'light');
+  }
 });
 
-// Close when any link is tapped
-navLinks.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    navLinks.classList.remove('open');
-    hamburger.classList.remove('active');
-    hamburger.setAttribute('aria-expanded', 'false');
-    document.body.style.overflow = '';
-  });
-});
-
-// =====================================================================
-// SCROLL REVEAL — IntersectionObserver
-// =====================================================================
-const revealObserver = new IntersectionObserver((entries) => {
-  entries.forEach(entry => {
-    if (entry.isIntersecting) {
-      entry.target.classList.add('visible');
-      revealObserver.unobserve(entry.target); // fire once
-    }
-  });
-}, { threshold: 0.12 });
-
-document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
-
-// =====================================================================
-// GITHUB PROJECTS
-// =====================================================================
-
-/**
- * Escapes a string for safe insertion into HTML to prevent XSS.
- * @param {string} str
- * @returns {string}
- */
-function escapeHtml(str) {
-  if (str == null) return '';
-  return String(str)
+function escapeHtml(value) {
+  return String(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
+    .replace(/'/g, '&#39;');
 }
 
-/**
- * Validates that a URL is a safe GitHub HTTPS URL.
- * @param {string} url
- * @returns {string}
- */
-function sanitizeGithubUrl(url) {
-  try {
-    const parsed = new URL(url);
-    if (parsed.protocol === 'https:' && parsed.hostname === 'github.com') {
-      return url;
-    }
-  } catch (_) { /* invalid URL */ }
-  return '#';
+function formatDate(value) {
+  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(new Date(value));
 }
 
-/**
- * Returns a human-readable relative date string.
- * @param {string} dateStr  ISO 8601 date string
- * @returns {string}
- */
-function relativeDate(dateStr) {
-  const diffMs   = Date.now() - new Date(dateStr).getTime();
-  const diffDays = Math.floor(diffMs / 864e5);
-
-  if (diffDays === 0)  return 'today';
-  if (diffDays === 1)  return 'yesterday';
-  if (diffDays < 30)   return `${diffDays}d ago`;
-  if (diffDays < 365)  return `${Math.floor(diffDays / 30)}mo ago`;
-  return `${Math.floor(diffDays / 365)}yr ago`;
-}
-
-/** Common language → colour map */
-const LANG_COLORS = {
-  JavaScript:  '#f1e05a',
-  TypeScript:  '#3178c6',
-  Python:      '#3572a5',
-  Java:        '#b07219',
-  C:           '#555555',
-  'C++':       '#f34b7d',
-  'C#':        '#178600',
-  Go:          '#00add8',
-  Rust:        '#dea584',
-  HTML:        '#e34c26',
-  CSS:         '#563d7c',
-  Ruby:        '#701516',
-  Swift:       '#f05138',
-  Kotlin:      '#7f52ff',
-  Dart:        '#00b4ab',
-  PHP:         '#4f5d95',
-  Shell:       '#89e051',
-  'Jupyter Notebook': '#da5b0b',
-  Vue:         '#41b883',
-  Svelte:      '#ff3e00',
-};
-
-function getLangColor(lang) {
-  return LANG_COLORS[lang] || '#666666';
-}
-
-/**
- * Builds the HTML string for a single project card.
- * All user-controlled data is passed through escapeHtml.
- * @param {Object} repo
- * @returns {string}
- */
-function buildProjectCard(repo, index) {
-  const safeUrl  = sanitizeGithubUrl(repo.html_url);
-  const safeName = escapeHtml(repo.name);
-  const safeDesc = repo.description ? escapeHtml(repo.description) : null;
-
-  const langHtml = repo.language ? `
-    <span class="project-lang">
-      <span class="lang-dot" style="background:${getLangColor(repo.language)}" aria-hidden="true"></span>
-      ${escapeHtml(repo.language)}
-    </span>` : '';
-
-  const starsHtml = repo.stargazers_count > 0 ? `
-    <span class="project-stat" aria-label="${repo.stargazers_count} stars">
-      ★ ${repo.stargazers_count}
-    </span>` : '';
-
-  const forksHtml = repo.forks_count > 0 ? `
-    <span class="project-stat" aria-label="${repo.forks_count} forks">
-      ⑂ ${repo.forks_count}
-    </span>` : '';
-
+function homePage() {
   return `
-    <a
-      href="${safeUrl}"
-      target="_blank"
-      rel="noopener noreferrer"
-      class="project-card reveal"
-      aria-label="${safeName} — open on GitHub"
-      style="transition-delay:${index * 0.055}s"
-    >
-      <div class="project-header">
-        <span class="project-name">${safeName}</span>
-        <span class="project-arrow" aria-hidden="true">↗</span>
-      </div>
-      <p class="${safeDesc ? 'project-desc' : 'project-desc no-desc'}">
-        ${safeDesc || 'No description'}
+    <section class="intro">
+      <p class="eyebrow">About</p>
+      <h1>A showcase of stuff I enjoyed exploring</h1>
+      <p class="intro-copy">
+        I hope you find it interesting!
       </p>
-      <div class="project-footer">
-        ${langHtml}
-        ${starsHtml}
-        ${forksHtml}
-        <span class="project-updated" aria-label="Updated ${relativeDate(repo.updated_at)}">
-          ${relativeDate(repo.updated_at)}
-        </span>
-      </div>
-    </a>`;
+    </section>
+
+    <section class="about-card" id="about">
+      <h2>Who am I?</h2>
+      <p>A computer science student who enjoys solving cool problems and exploring the intricacies of computers :)</p>
+      <a class="back-link" href="#posts">Open posts</a>
+    </section>
+  `;
 }
 
-async function fetchProjects() {
-  const grid = document.getElementById('projects-grid');
+function postsPage() {
+  return `
+    <section class="intro intro-tight">
+      <p class="eyebrow">Posts</p>
+      <h1>Project explorations</h1>
+      <p class="intro-copy">
+    </section>
+
+    <section class="posts-panel posts-page" aria-labelledby="posts-heading">
+      <div class="section-head">
+        <h2 id="posts-heading">Posts</h2>
+        <p>${posts.length} entries</p>
+      </div>
+      <div class="posts-list">
+        ${posts
+          .map(
+            (post) => `
+              <article class="post-row">
+                <div class="post-meta">${formatDate(post.date)}</div>
+                <div class="post-body">
+                  <h3><a href="#project/${encodeURIComponent(post.slug)}">${escapeHtml(post.title)}</a></h3>
+                  <p>${escapeHtml(post.excerpt)}</p>
+                  <div class="tag-row">${post.categories.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
+                </div>
+              </article>
+            `
+          )
+          .join('')}
+      </div>
+    </section>
+  `;
+}
+
+function projectPage(post) {
+  return `
+    <article class="project-page">
+      <div class="project-head">
+        <a class="back-link" href="#home">Back</a>
+        <h1>${escapeHtml(post.title)}</h1>
+      </div>
+      <section class="markdown-card project-content">
+        <div id="markdown-root" class="markdown-body">
+          <p class="loading">Loading markdown…</p>
+        </div>
+      </section>
+    </article>
+  `;
+}
+
+function sanitizeMarkdown(markdownText) {
+  if (window.marked && window.DOMPurify) {
+    marked.setOptions({ gfm: true, breaks: true });
+    return DOMPurify.sanitize(marked.parse(markdownText));
+  }
+
+  return `<pre>${escapeHtml(markdownText)}</pre>`;
+}
+
+async function loadMarkdown(post) {
+  const root = document.getElementById('markdown-root');
+  if (!root) return;
 
   try {
-    const res = await fetch(
-      `https://api.github.com/users/${encodeURIComponent(GITHUB_USERNAME)}/repos?sort=updated&per_page=30&type=public`,
-      { headers: { Accept: 'application/vnd.github+json' } }
-    );
-
-    if (!res.ok) {
-      throw new Error(`GitHub API responded with ${res.status}`);
+    const response = await fetch(post.path, { cache: 'no-cache' });
+    if (!response.ok) {
+      throw new Error(`Failed to load ${post.path}`);
     }
 
-    const repos = await res.json();
-
-    // Only own repos; sort by stars descending, then most-recently-updated
-    const filtered = repos
-      .filter(r => !r.fork && !r.archived)
-      .sort((a, b) =>
-        b.stargazers_count - a.stargazers_count ||
-        new Date(b.updated_at) - new Date(a.updated_at)
-      );
-
-    if (filtered.length === 0) {
-      grid.innerHTML = `
-        <div class="error-state">
-          <p>No public repositories found.</p>
-          <a href="https://github.com/${encodeURIComponent(GITHUB_USERNAME)}"
-             target="_blank" rel="noopener noreferrer"
-             style="color:var(--accent-red)">
-            View profile on GitHub →
-          </a>
-        </div>`;
-      return;
+    root.innerHTML = sanitizeMarkdown(await response.text());
+    if (window.MathJax?.typesetPromise) {
+      await window.MathJax.typesetPromise([root]);
     }
-
-    grid.innerHTML = filtered.map((repo, i) => buildProjectCard(repo, i)).join('');
-
-    // Register new cards with the reveal observer
-    grid.querySelectorAll('.project-card.reveal').forEach(el => revealObserver.observe(el));
-
-  } catch (err) {
-    console.error('Failed to fetch GitHub repos:', err);
-    grid.innerHTML = `
-      <div class="error-state">
-        <p>Could not load projects right now.</p>
-        <a href="https://github.com/${encodeURIComponent(GITHUB_USERNAME)}"
-           target="_blank" rel="noopener noreferrer"
-           style="color:var(--accent-red)">
-          View on GitHub →
-        </a>
-      </div>`;
+  } catch (error) {
+    root.innerHTML = `
+      <div class="markdown-error">
+        <h2>Markdown not available</h2>
+        <p>Check that <code>${escapeHtml(post.path)}</code> exists.</p>
+      </div>
+    `;
   }
 }
 
-// Bootstrap
-fetchProjects();
+async function renderRoute() {
+  const hash = window.location.hash.slice(1) || 'home';
+
+  if (hash.startsWith('project/')) {
+    const slug = decodeURIComponent(hash.slice('project/'.length));
+    const post = posts.find((item) => item.slug === slug);
+
+    if (!post) {
+      app.innerHTML = `
+        <section class="intro error-view">
+          <p class="eyebrow">404</p>
+          <h1>That project does not exist.</h1>
+          <p class="intro-copy">Go back to the posts list and choose a different writeup.</p>
+          <a class="back-link" href="#posts">Return to posts</a>
+        </section>
+      `;
+      return;
+    }
+
+    app.innerHTML = projectPage(post);
+    await loadMarkdown(post);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
+  if (hash === 'posts') {
+    app.innerHTML = postsPage();
+    return;
+  }
+
+  app.innerHTML = homePage();
+}
+
+window.addEventListener('hashchange', renderRoute);
+renderRoute();
