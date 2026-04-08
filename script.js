@@ -93,7 +93,7 @@ function postsPage() {
     <section class="intro intro-tight">
       <p class="eyebrow">Posts</p>
       <h1>Project explorations</h1>
-      <p class="intro-copy">
+      <p class="intro-copy">Browse short writeups and experiments.</p>
     </section>
 
     <section class="posts-panel posts-page" aria-labelledby="posts-heading">
