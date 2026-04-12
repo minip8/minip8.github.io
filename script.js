@@ -8,12 +8,12 @@ const THEME_STORAGE_KEY = 'minip8-theme';
 
 const posts = [
   {
-    slug: 'hello',
-    title: 'Hello',
-    date: '2026-04-08',
-    categories: ['hello', 'world'],
-    excerpt: 'Hello world',
-    path: 'content/projects/hello/index.md',
+    slug: 'rs-neuralnet',
+    title: 'Rust neural net',
+    date: '12-04-2026',
+    categories: ['Rust', 'ML'],
+    excerpt: 'A blazingly slow neural net',
+    path: 'content/projects/rs-neuralnet/index.md',
   },
 ];
 
