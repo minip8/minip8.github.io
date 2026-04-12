@@ -26,8 +26,8 @@ So, what the heck is the stuff that isn't just the input and output?
 
 Well, the *other stuff* is what we use to generate $z$ and $a$.
 
-Let $j$ denote the $j^{th}$ node in layer $l-1$.<br>
-Let $k$ denote the $k^{th}$ node in layer $l$. <br>
+Let $j$ index the $j^{th}$ node in layer $l-1$.<br>
+Let $k$ index the $k^{th}$ node in layer $l$. <br>
 Let $w^l_{jk}$ denote the $j^{th}$ node's weighted influence towards node $k$. <br>
 Let $b^l_{k}$ denote the $k^{th}$ node's bias. <br>
 
