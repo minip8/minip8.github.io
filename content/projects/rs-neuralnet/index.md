@@ -35,22 +35,30 @@ Traditionally, it should be $w^l_{kj}$ to denote the $j^{th}$ node's weighted in
 
 Now, we can find $z^l_k$, the $k^{th}$ node's pre-activation value.
 $$
-z^l_k = \sum_{j} w^l_{jk} a^{l-1}_j + b^l_k
+\begin{align*}
+z^l_k &= \sum_{j} w^l_{jk} a^{l-1}_j + b^l_k
+\end{align*}
 $$
 
 And $a^l_k$.
 $$
-a^l_k = \sigma^l(z^l_k)
+\begin{align*}
+a^l_k &= \sigma^l(z^l_k)
+\end{align*}
 $$
 
 Through some observation, we find an elegant expression for $z^l$.
 $$
-z^l = a^{l-1} W^l + B^l
+\begin{align*}
+z^l &= a^{l-1} W^l + B^l
+\end{align*}
 $$
 
 Which naturally gives $a^l$.
 $$
-a^l = \sigma^l(z^l)
+\begin{align*}
+a^l &= \sigma^l(z^l)
+\end{align*}
 $$
 
 
@@ -74,7 +82,9 @@ We need to find $\nabla C$, which will give us the negative gradient, which is u
 We can split up $\nabla C$ into two parts.
 
 $$
-\nabla C = \left< \frac{\partial C}{\partial W}, \frac{\partial C}{\partial B} \right>\\
+\begin{align*}
+\nabla C &= \left< \frac{\partial C}{\partial W}, \frac{\partial C}{\partial B} \right>
+\end{align*}
 $$
 
 
