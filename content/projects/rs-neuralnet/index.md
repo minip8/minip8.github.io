@@ -6,7 +6,7 @@ Inspired by 3Blue1Brown's [articles](https://www.3blue1brown.com/topics/neural-n
 
 Consistent with 3b1b, I decided to go with a neural net with fully connected layers.
 
-### The forward pass
+## The forward pass
 
 Each layer in the neural net takes in some input, applies a set of transformations to yield an output, which is consequently passed onto the next layer.
 
@@ -62,7 +62,7 @@ a^l &= \sigma^l(z^l)
 $$
 
 
-### The backward pass
+## The backward pass
 
 After we obtain $a^L$, the output of the final layer, we need a measure of how 'good' the output is, which is effectively equivalent to measuring how 'bad' the output is.
 
@@ -73,7 +73,7 @@ Let's call this cost function $C$.
 Here, we will use Cross Entropy Loss as $C$, and our goal will be to minimise the output of $C$.
 
 
-#### Gradient Descent
+### Gradient Descent
 
 The maths behind this scary sounding name is surprisingly clean.
 
@@ -240,7 +240,7 @@ $$
 
 ...and that is one epoch done!
 
-#### Stochastic Gradient Descent
+### Stochastic Gradient Descent
 
 Often, using the *entire* training set for one epoch is quite expensive.
 
