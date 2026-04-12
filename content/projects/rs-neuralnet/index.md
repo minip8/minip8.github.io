@@ -29,7 +29,7 @@ Well, the *other stuff* is what we use to generate $z$ and $a$.
 Let $j$ denote the $j^{th}$ node in layer $l-1$.<br>
 Let $k$ denote the $k^{th}$ node in layer $l$. <br>
 Let $w^l_{jk}$ denote the $j^{th}$ node's weighted influence towards node $k$. <br>
-Let $b^l_{k}$ denote the $k^{th}$ node's bias.
+Let $b^l_{k}$ denote the $k^{th}$ node's bias. <br>
 
 Traditionally, it should be $w^l_{kj}$ to denote the $j^{th}$ node's weighted influence towards node $k$, but in implementation, we usually use the transposed matrix.
 
@@ -95,7 +95,7 @@ Recall
 $$
 \begin{align*}
 z^l &= a^{l-1} W^l + B^l \\
-a^l &= \sigma^l(z^l)
+a^l &= \sigma^l(z^l) \\
 \end{align*}
 $$
 
@@ -156,7 +156,7 @@ Now, instead of receiving a row vector as the input, we receive a matrix with mu
 
 Let $N$ denote the number of nodes in the $(l-1)^{th}$ layer. <br>
 Let $M$ denote the number of nodes in the $l^{th}$ layer. <br>
-Let $A$ be the input matrix, with dimensions $S \times N$ <br>
+Let $A$ be the input matrix, with dimensions $S \times N$. <br>
 
 Also, let
 $$
