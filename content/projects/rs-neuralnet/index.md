@@ -2,12 +2,11 @@
 
 Inspired by 3Blue1Brown's [articles](https://www.3blue1brown.com/topics/neural-networks), motivated to learn some [Rust](https://rust-lang.org/), and fascinated by the maths behind neural nets, I decided it would be fun to implement my own little neural net in Rust!
 
-
-## The neural net
-
-### Layers
+## Layers
 
 Consistent with 3b1b, I decided to go with a neural net with fully connected layers.
+
+### The forward pass
 
 Each layer in the neural net takes in some input, applies a set of transformations to yield an output, which is consequently passed onto the next layer.
 
@@ -15,12 +14,12 @@ At a high level, each node in a layer is influenced by every node in the previou
 
 
 For the $l^{th}$ layer, let's define:
-- $a^{l-1}$ to be the input of the $l^{th}$ layer
+- $a^{l-1}$ to be the input
 - $W^l$ to be the weights matrix
 - $B^l$ to be the bias row vector
-- $\sigma$ to be the activation function
-- $z^l$ to be the pre-activation output
-- $a^l$ to be the post-activation output
+- $\sigma^l$ to be the activation function
+- $z^l$ to be the pre-activation output row vector
+- $a^l$ to be the post-activation output row vector
 
 
 So, what the heck is the stuff that isn't just the input and output?
@@ -39,3 +38,205 @@ $$
 z^l_k = \sum_{j} w^l_{jk} a^{l-1}_j + b^l_k
 $$
 
+And $a^l_k$.
+$$
+a^l_k = \sigma^l(z^l_k)
+$$
+
+Through some observation, we find an elegant expression for $z^l$.
+$$
+z^l = a^{l-1} W^l + B^l
+$$
+
+Which naturally gives $a^l$.
+$$
+a^l = \sigma^l(z^l)
+$$
+
+
+### The backward pass
+
+After we obtain $a^L$, the output of the final layer, we need a measure of how 'good' the output is, which is effectively equivalent to measuring how 'bad' the output is.
+
+Thus, we can come up with a cost function, which will tell us how bad our predictions are.
+
+Let's call this cost function $C$.
+
+Here, we will use Cross Entropy Loss as $C$, and our goal will be to minimise the output of $C$.
+
+
+#### Gradient Descent
+
+The maths behind this scary sounding name is surprisingly clean.
+
+We need to find $\nabla C$, which will give us the negative gradient, which is used to 'descend' down $C$.
+
+We can split up $\nabla C$ into two parts.
+
+$$
+\nabla C = \left< \frac{\partial C}{\partial W}, \frac{\partial C}{\partial B} \right>\\
+$$
+
+
+Now, let's consider one specific layer $l$.
+
+Recall
+
+$$
+\begin{align*}
+z^l &= a^{l-1} W^l + B^l \\
+a^l &= \sigma^l(z^l)
+\end{align*}
+$$
+
+
+By the chain rule, we can observe that
+
+$$
+\begin{align*}
+\frac{\partial C}{\partial w^l_{jk}}
+
+&= \frac{\partial z^l_k}{\partial w^l_{jk}} \frac{\partial a^l_k}{\partial z^l_k} \frac{\partial C}{\partial a^l_k} \\
+
+&= a^{l-1}_j \cdot \sigma^{(l)\prime}(z^l_k) \cdot \frac{\partial C}{\partial a^l_k} \\
+\end{align*}
+$$
+
+Now, this part is where I like to think the term *back propagation* originates.
+
+Let's first try find an expression for $\frac{\partial C}{\partial a^{l-1}_j}$.
+
+$$
+\begin{align*}
+\frac{\partial C}{\partial a^{l-1}_j}
+
+&= \frac{\partial z^l_k}{\partial a^{l-1}_j} \frac{\partial C}{\partial z^l_k} \\
+\end{align*}
+$$
+
+WLOG, we can shift the layer to the right by one, and observe that the $(l+1)^{th}$ layer can compute $\frac{\partial C}{\partial a^l_k}$!!
+
+Obviously, the last layer $L$ does not have a layer to its right, but that's not a problem.
+
+$$
+\begin{align*}
+\frac{\partial C}{\partial a^L_k} &= \sigma^{(L)\prime}(a^L_k) \\
+\end{align*}
+$$
+
+
+Next up, we have the bias.
+
+$$
+\begin{align*}
+\frac{\partial C}{\partial b^l_k}
+
+&= \frac{\partial z^l_k}{\partial b^l_{k}} \frac{\partial a^l_k}{\partial z^l_k} \frac{\partial C}{\partial a^l_k} \\
+
+&= 1 \cdot \sigma^{(l)\prime}(z^l_k) \cdot \frac{\partial C}{\partial a^l_k} \\
+
+&= \sigma^{(l)\prime}(z^l_k) \cdot \frac{\partial C}{\partial a^l_k} \\
+\end{align*}
+$$
+
+
+Since we want to minimise $C$ over the entire training set, we can find the gradients of each individual sample, and then let $\nabla C$ be the average.
+
+Now, instead of receiving a row vector as the input, we receive a matrix with multiple rows, and the number of columns remains constant.
+
+Let $N$ denote the number of nodes in the $(l-1)^{th}$ layer. <br>
+Let $M$ denote the number of nodes in the $l^{th}$ layer. <br>
+Let $A$ be the input matrix, with dimensions $S \times N$ <br>
+
+Also, let
+$$
+\begin{align*}
+\delta^l_{ik} &= \sigma^{(l)\prime}(z^l_{ik}) \cdot \frac{\partial C}{\partial a^l_{ik}} \\
+
+\implies
+
+\Delta^l &= \sigma^{(l)\prime}(z^l_{ik}) \odot \frac{\partial C}{\partial a^l_{ik}} \\
+\end{align*}
+$$
+
+Note that row vectors are no longer row vectors. Taking this change into account is trivial - if a row vector's $x^{th}$ entry previously is $r_x$, now it becomes $r_{ix}$, as seen above.
+
+
+Now, let's revisit the $\nabla C$ w.r.t $w$.
+
+$$
+\begin{align*}
+\frac{\partial C}{\partial w^l_{jk}}
+
+
+&= \frac{1}{S} \sum_{i=1}^S a^{l-1}_{ij} \cdot \sigma^{(l)\prime}(z^l_{ik}) \cdot \frac{\partial C}{\partial a^l_{ik}} \\
+
+&= \frac{1}{S} \sum_{i=1}^S a^{l-1}_{ij} \cdot \delta^l_{ik} \\
+
+&= \frac{1}{S} \sum_{i=1}^S (A^{l-1})^T_{ji} \cdot \delta^l_{ik} \\
+
+&= \left( \frac{1}{S} (A^{l-1})^T \Delta^l \right)_{jk} \\
+
+\implies
+
+\frac{\partial C}{\partial W^l} &= \frac{1}{S} (A^{l-1})^T \Delta^l \\
+\end{align*}
+$$
+
+
+And also $\nabla C$ w.r.t $b$.
+
+$$
+\begin{align*}
+\frac{\partial C}{\partial b^l_k}
+
+&= \frac{1}{S} \sum_{i=1}^S \sigma^{(l)\prime}(z^l_{ik}) \cdot \frac{\partial C}{\partial a^l_{ik}} \\
+
+&= \frac{1}{S} \sum_{i=1}^S \delta^l_{ik} \\
+\end{align*}
+$$
+
+Here, let's define $\text{colSum}(X)$ to create a row vector $Y$, where
+
+$$
+\begin{align*}
+
+Y_j &= \sum_{i} X_{ij}
+
+\end{align*}
+$$
+
+So, we get
+
+$$
+\begin{align*}
+\frac{\partial C}{\partial B^l} &= \frac{1}{S} \text{colSum}(\Delta^l) \\
+\end{align*}
+$$
+
+...and tada! We have everything we need for $\nabla C$.
+
+All that remains is updating $W^l$ and $B^l$.
+
+$$
+\begin{align*}
+
+W^l &:= W^l - \frac{\partial C}{\partial W^l} \\
+
+B^l &:= B^l - \frac{\partial C}{\partial B^l} \\
+
+\end{align*}
+$$
+
+...and that is one epoch done!
+
+#### Stochastic Gradient Descent
+
+Often, using the *entire* training set for one epoch is quite expensive.
+
+Instead, we can break up the training set into small batches, which will result in much more epochs in the same amount of time, whilst still achieving the effect of gradient descent!
+
+
+And after getting Claude to test my neural net on [MNIST digits](https://en.wikipedia.org/wiki/MNIST_database), we get this result.
+
+![MNIST digits training and evaluation](mnist_digits_train.png)
