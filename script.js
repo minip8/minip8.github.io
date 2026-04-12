@@ -51,11 +51,18 @@ if (themeToggle) {
   });
 }
 
-themeMedia.addEventListener('change', (event) => {
+function handleSystemThemeChange(event) {
   if (!localStorage.getItem(THEME_STORAGE_KEY)) {
     setTheme(event.matches ? 'dark' : 'light');
   }
-});
+}
+
+if (typeof themeMedia.addEventListener === 'function') {
+  themeMedia.addEventListener('change', handleSystemThemeChange);
+} else if (typeof themeMedia.addListener === 'function') {
+  // iOS Safari < 14 uses addListener/removeListener on MediaQueryList.
+  themeMedia.addListener(handleSystemThemeChange);
+}
 
 function escapeHtml(value) {
   return String(value)
