@@ -194,13 +194,46 @@ function projectPage(post) {
   `;
 }
 
-function sanitizeMarkdown(markdownText) {
+function resolveRelativeAssetUrls(html, markdownPath) {
+  if (!markdownPath) {
+    return html;
+  }
+
+  const container = document.createElement('div');
+  container.innerHTML = html;
+
+  const markdownUrl = new URL(markdownPath, window.location.href);
+  const baseUrl = new URL('./', markdownUrl);
+  const isRelative = (value) => {
+    if (!value) return false;
+    return !/^(?:[a-z]+:|\/\/|#|\/)/i.test(value);
+  };
+
+  container.querySelectorAll('img[src]').forEach((img) => {
+    const src = img.getAttribute('src');
+    if (isRelative(src)) {
+      img.setAttribute('src', new URL(src, baseUrl).pathname);
+    }
+  });
+
+  container.querySelectorAll('a[href]').forEach((anchor) => {
+    const href = anchor.getAttribute('href');
+    if (isRelative(href)) {
+      anchor.setAttribute('href', new URL(href, baseUrl).pathname);
+    }
+  });
+
+  return container.innerHTML;
+}
+
+function sanitizeMarkdown(markdownText, markdownPath) {
   if (window.marked && window.DOMPurify) {
     const { protectedText, segments } = extractMathSegments(markdownText);
     marked.setOptions({ gfm: true, breaks: false });
     const parsedHtml = marked.parse(protectedText);
     const htmlWithMath = restoreMathSegments(parsedHtml, segments);
-    return DOMPurify.sanitize(htmlWithMath);
+    const sanitizedHtml = DOMPurify.sanitize(htmlWithMath);
+    return resolveRelativeAssetUrls(sanitizedHtml, markdownPath);
   }
 
   return `<pre>${escapeHtml(markdownText)}</pre>`;
@@ -216,7 +249,7 @@ async function loadMarkdown(post) {
       throw new Error(`Failed to load ${post.path}`);
     }
 
-    root.innerHTML = sanitizeMarkdown(await response.text());
+    root.innerHTML = sanitizeMarkdown(await response.text(), post.path);
     if (window.MathJax?.typesetPromise) {
       await window.MathJax.typesetPromise([root]);
     }
