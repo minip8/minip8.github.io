@@ -66,6 +66,46 @@ function escapeHtml(value) {
     .replace(/'/g, '&#39;');
 }
 
+function extractMathSegments(markdownText) {
+  const segments = [];
+  let protectedText = String(markdownText);
+
+  // Preserve display math first so inline replacement does not split it.
+  protectedText = protectedText.replace(/\$\$[\s\S]+?\$\$/g, (match) => {
+    const token = `@@MATH_${segments.length}@@`;
+    segments.push(match);
+    return token;
+  });
+
+  protectedText = protectedText.replace(/\\\[[\s\S]+?\\\]/g, (match) => {
+    const token = `@@MATH_${segments.length}@@`;
+    segments.push(match);
+    return token;
+  });
+
+  // Inline math (single-line) after display math placeholders are in place.
+  protectedText = protectedText.replace(/(?<!\\)\$(?!\$)([^\n$]|\\\$)+?(?<!\\)\$/g, (match) => {
+    const token = `@@MATH_${segments.length}@@`;
+    segments.push(match);
+    return token;
+  });
+
+  protectedText = protectedText.replace(/\\\([^\n]+?\\\)/g, (match) => {
+    const token = `@@MATH_${segments.length}@@`;
+    segments.push(match);
+    return token;
+  });
+
+  return { protectedText, segments };
+}
+
+function restoreMathSegments(html, segments) {
+  return html.replace(/@@MATH_(\d+)@@/g, (_, idx) => {
+    const segment = segments[Number(idx)];
+    return segment ? escapeHtml(segment) : '';
+  });
+}
+
 function formatDate(value) {
   const parsed = new Date(value);
   if (!Number.isNaN(parsed.getTime())) {
@@ -156,8 +196,11 @@ function projectPage(post) {
 
 function sanitizeMarkdown(markdownText) {
   if (window.marked && window.DOMPurify) {
-    marked.setOptions({ gfm: true, breaks: true });
-    return DOMPurify.sanitize(marked.parse(markdownText));
+    const { protectedText, segments } = extractMathSegments(markdownText);
+    marked.setOptions({ gfm: true, breaks: false });
+    const parsedHtml = marked.parse(protectedText);
+    const htmlWithMath = restoreMathSegments(parsedHtml, segments);
+    return DOMPurify.sanitize(htmlWithMath);
   }
 
   return `<pre>${escapeHtml(markdownText)}</pre>`;
