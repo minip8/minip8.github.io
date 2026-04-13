@@ -172,7 +172,7 @@ $$
 Note that row vectors are no longer row vectors. Taking this change into account is trivial - if a row vector's $x^{th}$ entry previously is $r_x$, now it becomes $r_{ix}$, as seen above.
 
 
-Now, let's revisit the $\nabla C$ w.r.t $w$.
+Now, let's revisit $\nabla C$ w.r.t $w$.
 
 $$
 \begin{align*}
@@ -247,6 +247,151 @@ Often, using the *entire* training set for one epoch is quite expensive.
 Instead, we can break up the training set into small batches, which will result in much more epochs in the same amount of time, whilst still achieving the effect of gradient descent!
 
 
-And after getting Claude to test my neural net on [MNIST digits](https://en.wikipedia.org/wiki/MNIST_database), we get this result.
+### Cost Function
+
+Above, we looked at $C$, *but what do we actually use for the cost function?*
+
+For multi-class classification, we typically go with cross entropy loss as our cost function.
+
+To figure out the *what* and *why* behind this choice, we must understand the ouptut of our neural net.
+
+Our neural net outputs a vector of logits, which can be normalised such that they sum to $1$, so that we may perceive these values as probabilities.
+
+Let $\mathbf{q}$ denote the normalised vector.
+
+One way to find $\mathbf{q}$ is to find the sum of $\mathbf{q}$, and divide each value by this sum.
+
+$$
+\begin{align*}
+
+\mathbf{q}_i &:= \frac{\mathbf{z}_i}{\sum_k \mathbf{z}_k} \\
+
+\end{align*}
+$$
+
+
+However, because of very nice properties of $e$, we instead do
+
+$$
+\begin{align*}
+
+\mathbf{q}_i &:= \frac{\exp(\mathbf{z}_i)}{\sum_k \exp(\mathbf{z}_k)} \\
+
+\end{align*}
+$$
+
+to find the *softmax* of $z$.
+
+Now, we have to consider our *goal*: predict the true class $y$.
+
+Naturally, we want to maximise $\mathbf{q}_y$, which is equivalent of maximising its negative log: $-\ln(\mathbf{q}_y)$.
+
+Hence, we get
+
+$$
+\begin{align*}
+
+C(z) &= -\ln(\mathbf{q}_y) \\
+
+&= -\ln \left( \frac{\exp(z_y)}{\sum_k \exp(z_k)} \right) \\
+
+&= -z_y + \ln \sum_k \exp(z_k) \\
+
+\end{align*}
+$$
+
+We then find the gradient.
+
+First consider case $1$: $i = y$.
+
+$$
+\begin{align*}
+
+\frac{\partial C}{\partial z_i}
+
+&= \frac{\partial C}{\partial z_y} \\
+
+&= -1 + \frac{1}{\sum_k \exp(z_k)} \exp(z_y) \\
+
+&= -1 + \mathbf{q}_y \\
+
+\end{align*}
+$$
+
+Then consider case $2$: $i \neq y$.
+
+$$
+\begin{align*}
+
+\frac{\partial C}{\partial z_i}
+
+&= 0 + \frac{1}{\sum_k \exp(z_k)} \exp(z_i) \\
+
+&= \mathbf{q}_y \\
+
+\end{align*}
+$$
+
+So, we get a very clean expression for the gradient.
+
+$$
+\frac{\partial C}{\partial z_j} =
+
+\begin{cases}
+
+\mathbf{q}_i - 1, & i = y \\
+\mathbf{q}_i,     & i \neq y \\
+
+\end{cases}
+$$
+
+
+However, since our neural nets run on computers, our numbers are expressed as [floats](https://en.wikipedia.org/wiki/Floating-point_arithmetic), with limited precision.
+
+This limitation may become a significant problem when dealing with *extremely* large numbers...
+
+$$
+\begin{align*}
+\sum_k \exp(z_k)
+\end{align*}
+$$
+
+Here, there is a very real possibility that this sum may cause a great loss of precision.
+
+To combat this problem, we apply the max-shift method.
+
+Let $m$ denote $\max(z)$.
+
+We can find an alternate expression for softmax.
+
+$$
+\begin{align*}
+
+\mathbf{q}_i &= \frac{\exp(\mathbf{z}_i)}{\sum_k \exp(\mathbf{z}_k)} \\
+
+&= \frac{\exp(\mathbf{z}_i - m)}{\sum_k \exp(\mathbf{z}_k - m)} \\
+
+\end{align*}
+$$
+
+And thus the cost function.
+$$
+\begin{align*}
+
+C(z) &= -z_y + \ln \sum_k \exp(z_k) \\
+
+&= -z_y + \ln \sum_k \exp(z_k - m) \exp(m) \\
+
+&= -z_y + \ln \left( \exp(m) \sum_k \exp(z_k - m) \right) \\
+
+&= -z_y + m + \ln \sum_k \exp(z_k - m) \\
+
+\end{align*}
+$$
+
+
+## Testing the model
+
+After getting Claude to test the neural net on [MNIST digits](https://en.wikipedia.org/wiki/MNIST_database), we get this result.
 
 ![MNIST digits training and evaluation](mnist_digits_train.png)
