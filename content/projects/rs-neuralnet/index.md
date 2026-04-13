@@ -257,14 +257,14 @@ To figure out the *what* and *why* behind this choice, we must understand the ou
 
 Our neural net outputs a vector of logits, which can be normalised such that they sum to $1$, so that we may perceive these values as probabilities.
 
-Let $\mathbf{q}$ denote the normalised vector.
+Let $q$ denote the normalised vector.
 
-One way to find $\mathbf{q}$ is to find the sum of $\mathbf{q}$, and divide each value by this sum.
+One way to find $q$ is to find the sum of $q$, and divide each value by this sum.
 
 $$
 \begin{align*}
 
-\mathbf{q}_i &:= \frac{\mathbf{z}_i}{\sum_k \mathbf{z}_k} \\
+q_i &:= \frac{z_i}\sum_k {z}_k \\
 
 \end{align*}
 $$
@@ -275,7 +275,7 @@ However, because of very nice properties of $e$, we instead do
 $$
 \begin{align*}
 
-\mathbf{q}_i &:= \frac{\exp(\mathbf{z}_i)}{\sum_k \exp(\mathbf{z}_k)} \\
+q_i &:= \frac{\exp(z_i)}{\sum_k \exp{z}_k} \\
 
 \end{align*}
 $$
@@ -284,14 +284,14 @@ to find the *softmax* of $z$.
 
 Now, we have to consider our *goal*: predict the true class $y$.
 
-Naturally, we want to maximise $\mathbf{q}_y$, which is equivalent of maximising its negative log: $-\ln(\mathbf{q}_y)$.
+Naturally, we want to maximise $q_y$, which is equivalent of maximising its negative log: $-\ln(q_y)$.
 
 Hence, we get
 
 $$
 \begin{align*}
 
-C(z) &= -\ln(\mathbf{q}_y) \\
+C(z) &= -\ln(q_y) \\
 
 &= -\ln \left( \frac{\exp(z_y)}{\sum_k \exp(z_k)} \right) \\
 
@@ -313,7 +313,7 @@ $$
 
 &= -1 + \frac{1}{\sum_k \exp(z_k)} \exp(z_y) \\
 
-&= -1 + \mathbf{q}_y \\
+&= -1 + q_y \\
 
 \end{align*}
 $$
@@ -327,7 +327,7 @@ $$
 
 &= 0 + \frac{1}{\sum_k \exp(z_k)} \exp(z_i) \\
 
-&= \mathbf{q}_y \\
+&= q_y \\
 
 \end{align*}
 $$
@@ -339,8 +339,8 @@ $$
 
 \begin{cases}
 
-\mathbf{q}_i - 1, & i = y \\
-\mathbf{q}_i,     & i \neq y \\
+q_i - 1, & i = y \\
+q_i,     & i \neq y \\
 
 \end{cases}
 $$
@@ -367,9 +367,9 @@ We can find an alternate expression for softmax.
 $$
 \begin{align*}
 
-\mathbf{q}_i &= \frac{\exp(\mathbf{z}_i)}{\sum_k \exp(\mathbf{z}_k)} \\
+q_i &= \frac{\exp(z_i)}{\sum_k \exp{z}_k} \\
 
-&= \frac{\exp(\mathbf{z}_i - m)}{\sum_k \exp(\mathbf{z}_k - m)} \\
+&= \frac{\exp(z_i - m)}{\sum_k \exp(z_k - m)} \\
 
 \end{align*}
 $$
