@@ -264,7 +264,7 @@ One way to find $q$ is to find the sum of $q$, and divide each value by this sum
 $$
 \begin{align*}
 
-q_i &:= \frac{z_i}\sum_k {z}_k \\
+q_i &:= \frac{z_i}{\sum_k {z}_k} \\
 
 \end{align*}
 $$
