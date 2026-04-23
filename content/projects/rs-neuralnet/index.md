@@ -392,6 +392,6 @@ $$
 
 ## Testing the model
 
-After getting Claude to test the neural net on [MNIST digits](https://en.wikipedia.org/wiki/MNIST_database), we get this result.
+After getting Claude to test the neural net on [MNIST fashion](https://github.com/zalandoresearch/fashion-mnist), we get this result.
 
-![MNIST digits training and evaluation](mnist_digits_train.png)
+![MNIST fashion training and evaluation](mnist_fashion_train.png)
