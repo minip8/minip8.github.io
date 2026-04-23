@@ -81,9 +81,10 @@ code,
 }
 
 .page-shell {
-  width: min(860px, calc(100% - 24px));
+  width: 100%;
+  max-width: 860px;
   margin: 0 auto;
-  padding: 20px 0 28px;
+  padding: 20px 20px 28px;
 }
 
 .site-header {
@@ -506,8 +507,9 @@ code,
 
 @media (max-width: 600px) {
   .page-shell {
-    width: calc(100% - 20px);
     padding-top: 18px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .site-nav {
