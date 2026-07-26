@@ -15,6 +15,14 @@ const posts = [
     excerpt: 'A blazingly slow neural net',
     path: 'content/projects/rs-neuralnet/index.md',
   },
+  {
+    slug: 'cpp-exchange',
+    title: 'C++ exchange',
+    date: '26-07-2026',
+    categories: ['C++'],
+    excerpt: 'A modern exchange',
+    path: 'content/projects/exchange/index.md',
+  },
 ];
 
 function setTheme(theme) {
