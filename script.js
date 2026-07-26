@@ -23,8 +23,10 @@ function setTheme(theme) {
   localStorage.setItem(THEME_STORAGE_KEY, resolvedTheme);
   document.documentElement.style.colorScheme = resolvedTheme;
   if (themeToggle) {
-    themeToggle.textContent = resolvedTheme === 'dark' ? 'Light' : 'Dark';
-    themeToggle.setAttribute('aria-label', `Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`);
+    // Icon swap is CSS-driven off data-theme; only the label changes here.
+    const label = `Switch to ${resolvedTheme === 'dark' ? 'light' : 'dark'} mode`;
+    themeToggle.setAttribute('aria-label', label);
+    themeToggle.setAttribute('title', label);
   }
   const themeColor = resolvedTheme === 'dark' ? '#111111' : '#ffffff';
   const metaThemeColor = document.querySelector('meta[name="theme-color"]');

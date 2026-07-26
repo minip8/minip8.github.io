@@ -75,8 +75,7 @@ a {
   text-decoration: none;
 }
 
-code,
-.theme-toggle {
+code {
   font-family: var(--mono);
 }
 
@@ -134,17 +133,46 @@ code,
 }
 
 .theme-toggle {
-  min-height: 34px;
-  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  padding: 0;
   border: 1px solid var(--border);
   border-radius: 999px;
   background: transparent;
-  color: var(--text);
+  color: var(--muted);
   cursor: pointer;
 }
 
 .theme-toggle:hover {
   border-color: var(--border-strong);
+  color: var(--accent);
+}
+
+.theme-icon {
+  display: block;
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.theme-icon-sun {
+  display: none;
+}
+
+:root[data-theme='dark'] .theme-icon-sun {
+  display: block;
+}
+
+:root[data-theme='dark'] .theme-icon-moon {
+  display: none;
 }
 
 .app {
@@ -518,8 +546,7 @@ code,
     gap: 10px;
   }
 
-  .site-nav a,
-  .theme-toggle {
+  .site-nav a {
     min-height: 36px;
     display: inline-flex;
     align-items: center;
@@ -559,7 +586,8 @@ code,
   }
 
   .theme-toggle {
-    min-height: 36px;
+    width: 36px;
+    height: 36px;
   }
 
   .markdown-body pre {
