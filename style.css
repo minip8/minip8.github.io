@@ -400,16 +400,25 @@ code {
   margin-top: 0;
 }
 
+/* Headings share the `margin: 0` rule above with the page chrome, which sits in
+   grid containers with their own gap. Prose has no such gap, so re-add spacing
+   here or every heading collides with the paragraph under it. */
 .markdown-body h1 {
+  margin: 2.4rem 0 1rem;
   font-size: 1.85rem;
+  line-height: 1.15;
 }
 
 .markdown-body h2 {
-  font-size: 1.2rem;
+  margin: 2.2rem 0 0.9rem;
+  font-size: 1.5rem;
+  line-height: 1.2;
 }
 
 .markdown-body h3 {
-  font-size: 1.05rem;
+  margin: 1.8rem 0 0.75rem;
+  font-size: 1.2rem;
+  line-height: 1.25;
 }
 
 .markdown-body p,
@@ -440,12 +449,15 @@ code {
   text-underline-offset: 3px;
 }
 
+/* IBM Plex Mono runs wider and heavier than Source Sans 3 at a matched cap
+   height, so an optically equal size still reads as bigger than the prose.
+   0.85em plus a tighter chip is what actually sits level with body text. */
 .markdown-body code {
-  padding: 0.16em 0.38em;
-  border-radius: 7px;
+  padding: 0.1em 0.3em;
+  border-radius: 6px;
   background: var(--bg-soft);
   font-family: var(--mono);
-  font-size: 0.92em;
+  font-size: 0.85em;
 }
 
 .markdown-body pre {

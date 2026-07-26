@@ -123,22 +123,29 @@ function restoreMathSegments(html, segments) {
   });
 }
 
+const dateFormatter = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' });
+
 function formatDate(value) {
-  const parsed = new Date(value);
-  if (!Number.isNaN(parsed.getTime())) {
-    return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(parsed);
+  // `posts` dates are dd-mm-yyyy. This must be parsed explicitly and *before*
+  // any new Date() attempt: JS reads a bare `04-12-2026` as mm-dd-yyyy and would
+  // silently render 4 December as "Apr 12". The explicit parse also sidesteps
+  // mobile Safari's stricter Date parser.
+  const match = /^([0-3]?\d)-([0-1]?\d)-(\d{4})$/.exec(String(value).trim());
+  if (match) {
+    const day = Number(match[1]);
+    const month = Number(match[2]);
+    const year = Number(match[3]);
+    const parsed = new Date(year, month - 1, day);
+    // Reject overflow (e.g. 31-02-2026 rolling into March).
+    if (parsed.getDate() === day && parsed.getMonth() === month - 1) {
+      return dateFormatter.format(parsed);
+    }
   }
 
-  // Fallback for legacy m-d-yyyy or mm-dd-yyyy values across strict mobile parsers.
-  const fallbackMatch = /^([0-1]?\d)-([0-3]?\d)-(\d{4})$/.exec(String(value));
-  if (fallbackMatch) {
-    const month = Number(fallbackMatch[1]);
-    const day = Number(fallbackMatch[2]);
-    const year = Number(fallbackMatch[3]);
-    const fallbackDate = new Date(year, month - 1, day);
-    if (!Number.isNaN(fallbackDate.getTime())) {
-      return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' }).format(fallbackDate);
-    }
+  // Anything else (ISO strings, etc.) falls back to the native parser.
+  const parsed = new Date(value);
+  if (!Number.isNaN(parsed.getTime())) {
+    return dateFormatter.format(parsed);
   }
 
   return String(value);

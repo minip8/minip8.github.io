@@ -34,7 +34,7 @@ Page content lives in template-literal functions, not in `index.html`. `index.ht
 1. Create `content/projects/<slug>/index.md` plus any images alongside it.
 2. Append an entry `{ slug, title, date, categories, excerpt, path }` to `posts`.
 
-`date` is `MM-DD-YYYY`. `formatDate()` first tries `new Date(value)`, then falls back to an explicit `m-d-yyyy` regex parse — mobile Safari's stricter parser is why that fallback exists. Keep the format consistent.
+`date` is `DD-MM-YYYY`. `formatDate()` parses that with an explicit `d-m-yyyy` regex **before** trying `new Date(value)` — order matters, because JS reads a bare `04-12-2026` as `MM-DD-YYYY` and would render 4 December as "Apr 12". The explicit parse also sidesteps mobile Safari's stricter parser. `new Date()` remains as a fallback for other formats (ISO, etc.). Keep the format consistent.
 
 ### Markdown → HTML pipeline
 
