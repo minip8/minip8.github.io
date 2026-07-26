@@ -42,6 +42,11 @@
 
 html {
   scroll-behavior: smooth;
+  /* Posts scroll, #home and #posts don't. On classic-scrollbar platforms the
+     scrollbar therefore appears and disappears between routes, changing the
+     client width and shifting the centred .page-shell by half a scrollbar.
+     Reserving the gutter always keeps every route aligned. */
+  scrollbar-gutter: stable;
 }
 
 body {
