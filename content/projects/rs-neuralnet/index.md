@@ -1,4 +1,4 @@
-# rs-neuralnet
+# [rs-neuralnet](https://github.com/minip8/rs-neuralnet.git)
 
 Inspired by 3Blue1Brown's [articles](https://www.3blue1brown.com/topics/neural-networks), motivated to learn some [Rust](https://rust-lang.org/), and fascinated by the maths behind neural nets, I decided it would be fun to implement my own little neural net in Rust!
 
