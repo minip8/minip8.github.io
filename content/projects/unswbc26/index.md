@@ -47,3 +47,6 @@ Unfortunately, we lost 3-4. :(
 However, this experience was definitely fun, and taught us a lot.
 Despite the sleepless nights and extensive Claude prompting, we now know the importance of compute, which we will definitely be using in any future Battlecodes!
 (I will **not** miss my PC's whirring fan in my room while I sleep)
+
+Final commit stats (lol):
+![github contributor stats](gh-stats.png)
