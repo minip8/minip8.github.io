@@ -23,6 +23,14 @@ const posts = [
     excerpt: 'A modern exchange',
     path: 'content/projects/exchange/index.md',
   },
+  {
+    slug: 'unswbc26',
+    title: 'UNSW Battlecode 2026',
+    date: '16-10-2026',
+    categories: ['Battlecode'],
+    excerpt: '@Claude',
+    path: 'content/projects/unswbc26/index.md',
+  },
 ];
 
 function setTheme(theme) {
