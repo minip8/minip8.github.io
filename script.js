@@ -31,6 +31,14 @@ const posts = [
     excerpt: '@Claude',
     path: 'content/projects/unswbc26/index.md',
   },
+  {
+    slug: 'mac-poker-bot',
+    title: 'MAC Poker Bot',
+    date: '20-10-2026',
+    categories: ['Hackathon', 'ML'],
+    excerpt: 'merch where',
+    path: 'content/projects/mac-poker-bot/index.md',
+  },
 ];
 
 function setTheme(theme) {
