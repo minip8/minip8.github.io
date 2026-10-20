@@ -114,6 +114,20 @@ code {
   margin: 8px 0 0;
   color: var(--soft);
   font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.site-kicker a {
+  color: var(--soft);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.github-icon {
+  vertical-align: middle;
 }
 
 .site-nav {
@@ -516,12 +530,9 @@ code {
   margin: 0;
 }
 
-.footer-links {
-  margin-top: 8px;
-}
 
-.footer-links a {
-  color: var(--muted);
+.github-icon {
+  vertical-align: middle;
 }
 
 @media (max-width: 840px) {

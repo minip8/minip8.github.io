@@ -169,30 +169,6 @@ function formatDate(value) {
 
 function homePage() {
   return `
-    <section class="intro">
-      <p class="eyebrow">About</p>
-      <h1>A showcase of stuff I enjoyed exploring</h1>
-      <p class="intro-copy">
-        I hope you find it interesting!
-      </p>
-    </section>
-
-    <section class="about-card" id="about">
-      <h2>Who am I?</h2>
-      <p>A computer science student who enjoys solving cool problems and exploring the intricacies of computers :)</p>
-      <a class="back-link" href="#posts">Open posts</a>
-    </section>
-  `;
-}
-
-function postsPage() {
-  return `
-    <section class="intro intro-tight">
-      <p class="eyebrow">Posts</p>
-      <h1>Project explorations</h1>
-      <p class="intro-copy">Browse short writeups and experiments.</p>
-    </section>
-
     <section class="posts-panel posts-page" aria-labelledby="posts-heading">
       <div class="section-head">
         <h2 id="posts-heading">Posts</h2>
@@ -217,6 +193,16 @@ function postsPage() {
     </section>
   `;
 }
+
+function aboutPage() {
+  return `
+    <section id="about">
+      <h2>About</h2>
+      <p>A computer science student who enjoys solving cool problems and exploring the intricacies of computers :)</p>
+    </section>
+  `;
+}
+
 
 function projectPage(post) {
   return `
@@ -329,7 +315,12 @@ async function renderRoute() {
   }
 
   if (hash === 'posts') {
-    app.innerHTML = postsPage();
+    app.innerHTML = homePage();
+    return;
+  }
+
+  if (hash === 'about') {
+    app.innerHTML = aboutPage();
     return;
   }
 
