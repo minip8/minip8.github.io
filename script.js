@@ -141,6 +141,12 @@ function restoreMathSegments(html, segments) {
 
 const dateFormatter = new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric', year: 'numeric' });
 
+function parsePostDate(value) {
+  const match = /^([0-3]?\d)-([0-1]?\d)-(\d{4})$/.exec(String(value).trim());
+  if (match) return new Date(Number(match[3]), Number(match[2]) - 1, Number(match[1]));
+  return new Date(value);
+}
+
 function formatDate(value) {
   // `posts` dates are dd-mm-yyyy. This must be parsed explicitly and *before*
   // any new Date() attempt: JS reads a bare `04-12-2026` as mm-dd-yyyy and would
@@ -175,7 +181,8 @@ function homePage() {
         <p>${posts.length} entries</p>
       </div>
       <div class="posts-list">
-        ${posts
+        ${[...posts]
+          .sort((a, b) => parsePostDate(b.date) - parsePostDate(a.date))
           .map(
             (post) => `
               <article class="post-row">
