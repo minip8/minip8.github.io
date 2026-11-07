@@ -1,0 +1,24 @@
+# Cloudflare Worker behind the site's contact form.
+# Deployed separately from the static site (Cloudflare Pages can't send email).
+
+name = "minip8-contact"
+main = "index.js"
+compatibility_date = "2026-10-01"
+
+# Runs in front of Pages on this one path, so the form posts same-origin.
+routes = [
+  { pattern = "minip8.com/api/contact", zone_name = "minip8.com" }
+]
+
+# Locked to a single verified Email Routing destination: the Worker can't be
+# used to email anyone else, whatever a request contains.
+send_email = [
+  { name = "EMAIL", destination_address = "mattybsn1340@gmail.com" }
+]
+
+[vars]
+# Must be an address on minip8.com (the sending address from Email Routing).
+FROM_ADDRESS = "contact@minip8.com"
+TO_ADDRESS = "mattybsn1340@gmail.com"
+# Origins allowed to post from a browser (production + local dev server).
+ALLOWED_ORIGINS = "https://minip8.com,http://localhost:8000"
