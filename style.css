@@ -562,7 +562,6 @@ textarea:focus-visible {
 .pill-button svg,
 .race-button svg,
 .submit-button svg,
-.track-marker svg,
 .contact-sent svg {
   width: 16px;
   height: 16px;
@@ -670,25 +669,6 @@ textarea:focus-visible {
   z-index: 1;
 }
 
-.track-marker {
-  margin: 0;
-  color: var(--soft);
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  letter-spacing: 0.08em;
-  line-height: 1.4;
-  text-align: center;
-}
-
-/* Opaque chip so the car passes behind the label rather than through it. */
-.track-marker > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 4px 10px;
-  background: var(--bg);
-}
-
 /* Empty space for the starting grid drawn in the lane underneath. */
 .track-start {
   height: 236px;
@@ -766,18 +746,16 @@ textarea:focus-visible {
 }
 
 /* Empty run-off after the last post: the finish line is drawn in the lane
-   100px from the bottom and the car parks below it. Nothing sits in the
-   car's path here, so the label lives in .lap-again instead. */
+   100px from the bottom and the car parks below it. Keep this clear of
+   content so nothing sits in the car's path. */
 .track-finish {
   height: 260px;
 }
 
 .lap-again {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-  padding: 8px 0 48px;
+  justify-content: center;
+  padding: 28px 0 48px;
 }
 
 .race-button,

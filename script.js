@@ -269,12 +269,6 @@ function homePage() {
       </div>
 
       <div class="lap-again">
-        <p class="track-marker">
-          <span>
-            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M5 21V4" /><path d="M5 4h13l-2.5 4L18 12H5" /></svg>
-            <span id="finish-label"></span>
-          </span>
-        </p>
         <button class="race-button" id="another-lap" type="button">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 12a9 9 0 1 0 3-6.7" /><path d="M3 4v5h5" /></svg>
           Another lap?
@@ -326,9 +320,6 @@ function renderTimeline() {
     ? 'newest first'
     : 'oldest first';
   document.getElementById('reverse-track').setAttribute('aria-pressed', String(timeline.reversed));
-  document.getElementById('finish-label').textContent = timeline.reversed
-    ? 'FINISH · WHERE IT ALL BEGAN'
-    : 'FINISH · NEXT LAP SOON';
   updateCar();
 }
 
