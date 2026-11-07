@@ -18,18 +18,25 @@ Must be served over HTTP. Opening `index.html` via `file://` breaks post pages, 
 
 ## Architecture
 
-Single-page app with a hash router. `renderRoute()` in `script.js:273` reads `location.hash` and swaps `innerHTML` on `#app`:
+Single-page app with a hash router. `renderRoute()` in `script.js` reads `location.hash` and swaps `innerHTML` on `#app`:
 
-- `#home` (default) → `homePage()`
-- `#posts` → `postsPage()`
+- `#home` (default), `#about`, `#posts`, `#contact` → `showHome(section)`: renders the one-page home (`homePage()`: About hero → Posts timeline → Contact form) if it isn't already on screen, then scrolls to that section. It deliberately doesn't re-render when already home, so the timeline direction and half-typed form survive nav clicks.
 - `#project/<slug>` → `projectPage(post)`, then `loadMarkdown(post)` fetches and renders the markdown asynchronously
 - unknown slug → inline 404 markup
 
 Page content lives in template-literal functions, not in `index.html`. `index.html` only carries the shell (header, empty `<main id="app">`, footer). To change home/posts copy, edit the functions in `script.js`, not the HTML.
 
+### Posts timeline and car
+
+The Posts section lists posts chronologically (oldest first; "Reverse track" flips it) in `renderTimeline()`, with day gaps computed from `posts` dates. A small F1 car drives down the middle: `.car-pin` is `position: sticky` inside `.lane` (which must stay `overflow: clip`, never `hidden`, or sticky breaks), it sits behind the opaque `.post-card`s so it only shows in the gaps, and `updateCar()` swerves it while it is moving and turns it to face the scroll direction (`SWERVE_*`, `CAR_PARK_OFFSET`, which must match `.car-pin` margin-top and the pole slot in `GRID_SVG`). It parks on the starting grid at the top and just past the chequered finish line at the bottom. `prefers-reduced-motion` turns the swerve off.
+
+### Contact form
+
+The form posts `FormData` to `https://minip8.com/api/contact`, a separate Cloudflare Worker in `contact-worker/` (Pages itself can't send email). The Worker emails the verified Gmail destination via Email Routing, only accepts the origins in `ALLOWED_ORIGINS` (prod + `http://localhost:8000`, so local testing must use port 8000), and silently drops submissions that fill the hidden `website` honeypot field. Deploy it with `cd contact-worker && npx wrangler deploy`; pushing the site does not deploy it.
+
 ### Posts registry
 
-`posts` (`script.js:9`) is the single source of truth — a hardcoded array, no index file or directory scan. Adding a post is two steps:
+`posts` (top of `script.js`) is the single source of truth — a hardcoded array, no index file or directory scan. Adding a post is two steps:
 
 1. Create `content/projects/<slug>/index.md` plus any images alongside it.
 2. Append an entry `{ slug, title, date, categories, excerpt, path }` to `posts`.

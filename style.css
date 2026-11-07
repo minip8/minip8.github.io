@@ -12,6 +12,12 @@
   --accent: #2d2a26;
   --shadow: 0 10px 35px rgba(25, 21, 16, 0.06);
   --grid-opacity: 0.12;
+  --race: #c2410c;
+  --race-text: #c2410c;
+  --on-race: #ffffff;
+  --light-off: #e4e0d8;
+  --error: #b42318;
+  --card-shadow: 0 12px 32px rgba(25, 21, 16, 0.08);
   --radius-xl: 22px;
   --radius-lg: 16px;
   --radius-md: 12px;
@@ -34,6 +40,12 @@
   --accent: #f5f2ec;
   --shadow: 0 12px 38px rgba(0, 0, 0, 0.24);
   --grid-opacity: 0.06;
+  --race: #ff7a45;
+  --race-text: #ff7a45;
+  --on-race: #111111;
+  --light-off: #2c2a27;
+  --error: #ff8a80;
+  --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
 }
 
 * {
@@ -139,15 +151,13 @@ code {
 
 .site-nav a,
 .back-link,
-.link-list a,
-.post-body h3 a {
+.link-list a {
   color: var(--muted);
 }
 
 .site-nav a:hover,
 .back-link:hover,
-.link-list a:hover,
-.post-body h3 a:hover {
+.link-list a:hover {
   color: var(--accent);
 }
 
@@ -196,6 +206,9 @@ code {
 
 .app {
   display: grid;
+  /* minmax(0, 1fr): without it, the contact form's two-column grid sets the
+     column's min width (~500px) and the whole page overflows on phones. */
+  grid-template-columns: minmax(0, 1fr);
   gap: 20px;
 }
 
@@ -215,8 +228,7 @@ code {
 }
 
 .app > .intro:not(.intro-tight) h1,
-.app > .intro:not(.intro-tight) .intro-copy,
-.app > .about-card p {
+.app > .intro:not(.intro-tight) .intro-copy {
   max-width: none;
 }
 
@@ -231,8 +243,6 @@ code {
 
 .intro h1,
 .project-head h1,
-.section-head h2,
-.about-card h2,
 .markdown-body h1,
 .markdown-body h2,
 .markdown-body h3 {
@@ -255,106 +265,12 @@ code {
   line-height: 1.85;
 }
 
-.about-card,
-.posts-panel,
 .markdown-card,
 .error-view {
   border: 0;
   border-radius: 0;
   background: transparent;
   box-shadow: none;
-}
-
-.about-card {
-  padding: 0;
-  display: grid;
-  gap: 12px;
-}
-
-.about-card h2 {
-  font-size: 1.3rem;
-}
-
-.about-card p {
-  margin: 0;
-  max-width: 58ch;
-  color: var(--text);
-}
-
-.content-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(240px, 0.7fr);
-  gap: 22px;
-  align-items: start;
-}
-
-.posts-page {
-  display: block;
-}
-
-.posts-panel {
-  padding: 0;
-}
-
-.posts-page .posts-panel {
-  width: 100%;
-}
-
-.section-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 12px;
-  padding-bottom: 14px;
-  border-bottom: 1px solid var(--border);
-}
-
-.section-head h2 {
-  font-size: 1.45rem;
-}
-
-.section-head p {
-  margin: 0;
-  color: var(--soft);
-  font-size: 0.92rem;
-}
-
-.posts-list {
-  display: grid;
-}
-
-.post-row {
-  display: grid;
-  grid-template-columns: 128px minmax(0, 1fr);
-  gap: 16px;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.post-row:last-child {
-  border-bottom: 0;
-  padding-bottom: 0;
-}
-
-.post-meta {
-  color: var(--soft);
-  font-family: var(--mono);
-  font-size: 0.8rem;
-  white-space: nowrap;
-}
-
-.post-body h3 {
-  margin: 0 0 7px;
-  font-family: var(--serif);
-  font-size: clamp(1.15rem, 2.2vw, 1.45rem);
-  line-height: 1.15;
-}
-
-.post-body p {
-  margin: 0;
-  color: var(--text);
-  line-height: 1.84;
 }
 
 .tag-row {
@@ -519,11 +435,12 @@ code {
   padding-top: 14px;
   border-top: 1px solid var(--border);
   color: var(--soft);
-  font-size: 0.92rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 16px;
 }
 
 .site-footer p {
@@ -531,8 +448,539 @@ code {
 }
 
 
-.github-icon {
-  vertical-align: middle;
+/* ---------------------------------------------------------------------------
+   Home: About (hero) → Posts timeline → Contact
+   --------------------------------------------------------------------------- */
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--race);
+  outline-offset: 2px;
+}
+
+.hero,
+.timeline-section,
+.contact-section {
+  scroll-margin-top: 16px;
+}
+
+.hero {
+  display: grid;
+  gap: 20px;
+  max-width: 700px;
+  padding: 40px 0 32px;
+}
+
+.start-lights {
+  display: flex;
+  gap: 10px;
+}
+
+.start-lights span {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #e10600;
+  box-shadow: 0 0 12px rgba(225, 6, 0, 0.5);
+}
+
+.start-lights span.is-off {
+  background: var(--light-off);
+  box-shadow: none;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(2.4rem, 6vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+.hero p {
+  margin: 0;
+  max-width: 580px;
+  color: var(--muted);
+  font-size: 1.2rem;
+  line-height: 1.55;
+}
+
+/* Timeline header */
+
+.timeline-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.timeline-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 14px;
+}
+
+.timeline-title h2,
+.contact-section h2 {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.timeline-order {
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+}
+
+.pill-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.pill-button:hover {
+  border-color: var(--text);
+}
+
+.pill-button svg,
+.race-button svg,
+.submit-button svg,
+.track-marker svg,
+.contact-sent svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* The track: the car drives down the middle, behind the post cards, so it
+   only shows in the gaps between them. */
+
+.track {
+  position: relative;
+}
+
+.lane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  z-index: 0;
+  width: 160px;
+  margin-left: -80px;
+  /* clip, not hidden: hidden would make this a scroll container and break sticky. */
+  overflow: clip;
+  pointer-events: none;
+}
+
+.car-pin {
+  position: sticky;
+  top: calc(50vh - 31px);
+  width: 28px;
+  height: 62px;
+  /* Parks the car in the pole slot of .start-grid. Keep in sync with
+     CAR_PARK_OFFSET in script.js. */
+  margin: 106px auto 0;
+}
+
+/* Starting grid: sits at the top of the lane, behind the car. */
+.start-grid {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  width: 160px;
+  height: 190px;
+  color: var(--soft);
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.start-grid text {
+  fill: currentColor;
+  stroke: none;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-anchor: middle;
+}
+
+.start-grid .start-line {
+  fill: var(--text);
+  stroke: none;
+}
+
+/* Chequered finish line near the bottom of the lane; the car parks just past it. */
+.finish-line {
+  position: absolute;
+  bottom: 100px;
+  left: 16px;
+  right: 16px;
+  height: 16px;
+  border: 1px solid var(--text);
+  background: conic-gradient(var(--text) 25%, var(--bg) 0 50%, var(--text) 0 75%, var(--bg) 0) 0 0 / 16px 16px;
+}
+
+.car-sway {
+  width: 28px;
+  height: 62px;
+  will-change: transform;
+}
+
+.car {
+  display: block;
+  width: 28px;
+  height: 62px;
+  filter: drop-shadow(0 4px 4px rgba(0, 0, 0, 0.25));
+  transition: transform 0.45s cubic-bezier(0.5, 0, 0.2, 1);
+}
+
+.car.is-facing-up {
+  transform: rotate(180deg);
+}
+
+.car-livery {
+  fill: var(--race);
+}
+
+.track-content {
+  position: relative;
+  z-index: 1;
+}
+
+.track-marker {
+  margin: 0;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-align: center;
+}
+
+/* Opaque chip so the car passes behind the label rather than through it. */
+.track-marker > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 4px 10px;
+  background: var(--bg);
+}
+
+/* Empty space for the starting grid drawn in the lane underneath. */
+.track-start {
+  height: 236px;
+}
+
+.track-list {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0;
+  list-style: none;
+}
+
+.track-gap {
+  position: relative;
+  height: 168px;
+}
+
+.track-gap span {
+  position: absolute;
+  top: 50%;
+  left: calc(50% + 88px);
+  translate: 0 -50%;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.post-card {
+  display: grid;
+  gap: 10px;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+}
+
+.post-card-meta {
+  margin: 0;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.post-card-latest {
+  color: var(--race-text);
+  font-weight: 600;
+}
+
+.post-card h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.15;
+}
+
+.post-card h3 a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.post-card-excerpt {
+  margin: 0;
+  color: var(--muted);
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.post-card .tag-row {
+  margin-top: 2px;
+}
+
+/* Empty run-off after the last post: the finish line is drawn in the lane
+   100px from the bottom and the car parks below it. Nothing sits in the
+   car's path here, so the label lives in .lap-again instead. */
+.track-finish {
+  height: 260px;
+}
+
+.lap-again {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 0 48px;
+}
+
+.race-button,
+.submit-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: 0;
+  border-radius: 999px;
+  font-family: var(--sans);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.race-button {
+  background: var(--race);
+  color: var(--on-race);
+}
+
+.race-button svg,
+.submit-button svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 2.2;
+}
+
+@supports (animation-timeline: view()) {
+  .reveal {
+    animation: card-rise linear both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
+
+  @keyframes card-rise {
+    from {
+      opacity: 0;
+      translate: 0 28px;
+    }
+    to {
+      opacity: 1;
+      translate: 0 0;
+    }
+  }
+}
+
+/* Contact */
+
+.contact-section {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 24px;
+  padding: 48px 0 32px;
+  border-top: 1px solid var(--border);
+}
+
+.contact-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px 20px;
+  max-width: 720px;
+}
+
+.field {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.field-wide,
+.form-actions {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.field input,
+.field textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background: var(--card);
+  color: var(--text);
+  font: inherit;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.field textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.field input:focus,
+.field textarea:focus {
+  border-color: var(--text);
+}
+
+/* Honeypot: off-screen for people, still in the DOM for bots. */
+.hp-field {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 16px;
+}
+
+.submit-button {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.form-error {
+  margin: 0;
+  color: var(--error);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.contact-sent {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 720px;
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+}
+
+.contact-sent p {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.contact-sent svg {
+  width: 22px;
+  height: 22px;
+  stroke: var(--race);
+  stroke-width: 2.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    animation: none;
+  }
+
+  .car {
+    transition: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding: 24px 0 16px;
+  }
+
+  .hero p {
+    font-size: 1.05rem;
+  }
+
+
+
+  /* Phone width leaves no room right of the car; pin the gap label to the edge. */
+  .track-gap span {
+    left: auto;
+    right: 0;
+  }
+
+  .post-card {
+    padding: 18px;
+  }
+
+
 }
 
 @media (max-width: 840px) {
@@ -540,24 +988,13 @@ code {
     font-size: 17px;
   }
 
-  .site-header,
-  .content-grid {
+  .site-header {
     grid-template-columns: 1fr;
   }
 
   .site-header {
     display: grid;
     align-items: start;
-  }
-
-  .section-head {
-    align-items: start;
-    flex-wrap: wrap;
-  }
-
-  .post-row {
-    grid-template-columns: 1fr;
-    gap: 6px;
   }
 }
 
@@ -580,7 +1017,6 @@ code {
     align-items: center;
   }
 
-  .posts-panel,
   .markdown-card,
   .error-view {
     padding: 0;
@@ -607,10 +1043,6 @@ code {
 
   .markdown-body {
     line-height: 1.78;
-  }
-
-  .post-meta {
-    white-space: normal;
   }
 
   .theme-toggle {
