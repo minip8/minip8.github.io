@@ -2,6 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    // Send minip8.github.io visitors to the custom domain, keeping the #route.
+    if (location.hostname === 'minip8.github.io') {
+      location.replace('https://minip8.com' + location.pathname + location.search + location.hash);
+    }
+  </script>
+  <link rel="canonical" href="https://minip8.com/" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta
     name="description"
