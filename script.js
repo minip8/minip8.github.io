@@ -12,7 +12,6 @@ const posts = [
     title: 'Rust neural net',
     date: '12-04-2026',
     categories: ['Rust', 'ML'],
-    excerpt: 'A blazingly slow neural net',
     path: 'content/projects/rs-neuralnet/index.md',
   },
   {
@@ -20,7 +19,6 @@ const posts = [
     title: 'C++ exchange',
     date: '26-07-2026',
     categories: ['C++'],
-    excerpt: 'A modern exchange',
     path: 'content/projects/exchange/index.md',
   },
   {
@@ -28,7 +26,6 @@ const posts = [
     title: 'UNSW Battlecode 2026',
     date: '16-10-2026',
     categories: ['Battlecode'],
-    excerpt: '@Claude',
     path: 'content/projects/unswbc26/index.md',
   },
   {
@@ -36,7 +33,6 @@ const posts = [
     title: 'MAC Poker Bot',
     date: '20-10-2026',
     categories: ['Hackathon', 'ML'],
-    excerpt: 'merch where',
     path: 'content/projects/mac-poker-bot/index.md',
   },
   {
@@ -44,7 +40,6 @@ const posts = [
     title: 'ICPC Regional Finals 2026',
     date: '09-11-2026',
     categories: ['ICPC', 'Competitive Programming'],
-    excerpt: 'Observer team, zero wrong submissions',
     path: 'content/projects/icpc/index.md',
   },
 ];
@@ -316,7 +311,6 @@ function renderTimeline() {
           <article class="post-card reveal">
             <p class="post-card-meta">${formatDate(post.date)}${latestTag}</p>
             <h3><a href="#project/${encodeURIComponent(post.slug)}">${escapeHtml(post.title)}</a></h3>
-            <p class="post-card-excerpt">${escapeHtml(post.excerpt)}</p>
             <div class="tag-row">${post.categories.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
           </article>
         </li>

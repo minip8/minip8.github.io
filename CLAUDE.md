@@ -39,7 +39,7 @@ The form posts `FormData` to `https://minip8.com/api/contact`, a separate Cloudf
 `posts` (top of `script.js`) is the single source of truth — a hardcoded array, no index file or directory scan. Adding a post is two steps:
 
 1. Create `content/projects/<slug>/index.md` plus any images alongside it.
-2. Append an entry `{ slug, title, date, categories, excerpt, path }` to `posts`.
+2. Append an entry `{ slug, title, date, categories, path }` to `posts`.
 
 `date` is `DD-MM-YYYY`. `formatDate()` parses that with an explicit `d-m-yyyy` regex **before** trying `new Date(value)` — order matters, because JS reads a bare `04-12-2026` as `MM-DD-YYYY` and would render 4 December as "Apr 12". The explicit parse also sidesteps mobile Safari's stricter parser. `new Date()` remains as a fallback for other formats (ISO, etc.). Keep the format consistent.
 
