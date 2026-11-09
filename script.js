@@ -239,8 +239,8 @@ function homePage() {
       <div class="start-lights" aria-hidden="true">
         <span></span><span></span><span></span><span></span><span class="is-off"></span>
       </div>
-      <h1 id="hero-title">A lap through my experiences</h1>
-      <p>I'm a computer science student who enjoys solving cool problems and exploring the intricacies of computers.</p>
+      <h1 id="hero-title">Matt's miscellaneous showcase</h1>
+      <p>Hi! I'm a computer science student who enjoys solving fun and interesting problems. I also love a bit of friendly competition! :)</p>
     </section>
 
     <section class="timeline-section" id="posts" aria-labelledby="posts-heading">
