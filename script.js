@@ -39,6 +39,14 @@ const posts = [
     excerpt: 'merch where',
     path: 'content/projects/mac-poker-bot/index.md',
   },
+  {
+    slug: 'icpc',
+    title: 'ICPC Regional Finals 2026',
+    date: '09-11-2026',
+    categories: ['ICPC', 'Competitive Programming'],
+    excerpt: 'Observer team, zero wrong submissions',
+    path: 'content/projects/icpc/index.md',
+  },
 ];
 
 function setTheme(theme) {
