@@ -39,7 +39,9 @@ The form posts `FormData` to `https://minip8.com/api/contact`, a separate Cloudf
 `posts` (top of `script.js`) is the single source of truth — a hardcoded array, no index file or directory scan. Adding a post is two steps:
 
 1. Create `content/projects/<slug>/index.md` plus any images alongside it.
-2. Append an entry `{ slug, title, date, categories, path }` to `posts`.
+2. Append an entry `{ slug, title, date, posted?, categories, path }` to `posts`.
+
+`date` is when the event happened and drives everything on the timeline: sort order, day gaps, the car. An optional `posted` (same format, defaults to `date`) is when it was written up: cards posted within `NEW_POST_DAYS` get a "New" tag, and cards whose write-up lagged the event by more than `WRITTEN_LATE_DAYS` show "written <Mon YYYY>".
 
 `date` is `DD-MM-YYYY`. `formatDate()` parses that with an explicit `d-m-yyyy` regex **before** trying `new Date(value)` — order matters, because JS reads a bare `04-12-2026` as `MM-DD-YYYY` and would render 4 December as "Apr 12". The explicit parse also sidesteps mobile Safari's stricter parser. `new Date()` remains as a fallback for other formats (ISO, etc.). Keep the format consistent.
 

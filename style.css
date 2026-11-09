@@ -716,7 +716,7 @@ textarea:focus-visible {
   line-height: 1.4;
 }
 
-.post-card-latest {
+.post-card-new {
   color: var(--race-text);
   font-weight: 600;
 }
