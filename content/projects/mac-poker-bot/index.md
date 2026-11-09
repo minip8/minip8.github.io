@@ -1,5 +1,3 @@
-# MAC Poker Bot
-
 Monash Association of Coding (MAC) recently hosted a poker bot hackathon, where students competed to create a poker bot over 48 hours.
 
 Over the weekend, there was a live leaderboard with continuous games every few minutes. Crucially, all replays were publicly available.

@@ -1,5 +1,3 @@
-# UNSW Battlecode 2026
-
 This year, UNSW hosted their first [Battlecode](https://game.battlecode.au)!
 
 I teamed up with some friends from university to compete in our first Battlecode, entering as team `Settlers of Battlecode`.

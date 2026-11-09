@@ -1,5 +1,3 @@
-# ICPC Regional Finals 2026
-
 This year (2026), I, along with some friends, joined MAPS (Monash Algorithms and Problem Solving) as an academy member.
 
 This year was also the first year where I registered to compete in ICPC (International Collegiate Programming Contest), the most prestigious global team-based competitive programming competition for college/university students.

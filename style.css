@@ -319,11 +319,11 @@ code {
 .project-head {
   display: grid;
   gap: 8px;
-  max-width: 68ch;
   padding: 8px 0 4px;
 }
 
 .project-head h1 {
+  max-width: 68ch;
   font-size: clamp(2rem, 4vw, 3rem);
 }
 
@@ -699,6 +699,7 @@ textarea:focus-visible {
 }
 
 .post-card {
+  position: relative;
   display: grid;
   gap: 10px;
   padding: 22px 24px;
@@ -706,6 +707,11 @@ textarea:focus-visible {
   border-radius: var(--radius-lg);
   background: var(--card);
   box-shadow: var(--card-shadow);
+  transition: border-color 0.15s ease;
+}
+
+.post-card:hover {
+  border-color: var(--soft);
 }
 
 .post-card-meta {
@@ -729,9 +735,27 @@ textarea:focus-visible {
   line-height: 1.15;
 }
 
-.post-card h3 a:hover {
+.post-card h3 a:hover,
+.post-card:hover h3 a {
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* Stretch the title link over the whole card so anywhere on it is clickable. */
+.post-card h3 a::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+}
+
+.post-card h3 a:focus-visible {
+  outline: none;
+}
+
+.post-card h3 a:focus-visible::after {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
 
 .post-card .tag-row {

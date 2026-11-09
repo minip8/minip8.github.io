@@ -38,7 +38,8 @@ const posts = [
   {
     slug: 'icpc',
     title: 'ICPC Regional Finals 2026',
-    date: '09-11-2026',
+    date: '11-10-2026',
+    posted: '09-11-2026',
     categories: ['ICPC', 'Competitive Programming'],
     path: 'content/projects/icpc/index.md',
   },
@@ -150,12 +151,19 @@ function parsePostDate(value) {
   return new Date(value);
 }
 
-const monthYearFormatter = new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric' });
-
 // A post's `date` is when the event happened; `posted` (optional, same format)
 // is when it was written up and defaults to `date`.
 function postedDate(post) {
   return parsePostDate(post.posted || post.date);
+}
+
+// Event date, plus "posted <date>" when the write-up came on a different day.
+function postDates(post) {
+  const event = escapeHtml(formatDate(post.date));
+  if (!post.posted || postedDate(post).getTime() === parsePostDate(post.date).getTime()) {
+    return event;
+  }
+  return `${event} · posted ${escapeHtml(formatDate(post.posted))}`;
 }
 
 function formatDate(value) {
@@ -203,8 +211,6 @@ const CAR_HEIGHT = 62;
 
 // A post counts as "New" for this many days after it was posted.
 const NEW_POST_DAYS = 30;
-// Show "written <month>" on a card when the write-up lagged the event by more than this.
-const WRITTEN_LATE_DAYS = 30;
 
 const timeline = { reversed: false };
 const car = { facingUp: false, lastScrollY: window.scrollY };
@@ -318,15 +324,13 @@ function renderTimeline() {
               return `<div class="track-gap"><span>${label}</span></div>`;
             })();
       const posted = postedDate(post);
-      const writtenLate = (posted - parsePostDate(post.date)) / DAY_MS > WRITTEN_LATE_DAYS;
-      const writtenTag = writtenLate ? ` · written ${monthYearFormatter.format(posted)}` : '';
       const isNew = (now - posted) / DAY_MS <= NEW_POST_DAYS;
       const newTag = isNew ? ' · <span class="post-card-new">New</span>' : '';
       return `
         <li>
           ${gap}
           <article class="post-card reveal">
-            <p class="post-card-meta">${formatDate(post.date)}${writtenTag}${newTag}</p>
+            <p class="post-card-meta">${postDates(post)}${newTag}</p>
             <h3><a href="#project/${encodeURIComponent(post.slug)}">${escapeHtml(post.title)}</a></h3>
             <div class="tag-row">${post.categories.map((tag) => `<span>${escapeHtml(tag)}</span>`).join('')}</div>
           </article>
