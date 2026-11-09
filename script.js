@@ -40,7 +40,7 @@ const posts = [
     title: 'ICPC Regional Finals 2026',
     date: '11-10-2026',
     posted: '09-11-2026',
-    categories: ['ICPC', 'Competitive Programming'],
+    categories: ['Competitive Programming'],
     path: 'content/projects/icpc/index.md',
   },
 ];
