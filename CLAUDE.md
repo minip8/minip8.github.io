@@ -21,7 +21,7 @@ Must be served over HTTP. Opening `index.html` via `file://` breaks post pages, 
 Single-page app with a hash router. `renderRoute()` in `script.js` reads `location.hash` and swaps `innerHTML` on `#app`:
 
 - `#home` (default), `#about`, `#posts`, `#contact` → `showHome(section)`: renders the one-page home (`homePage()`: About hero → Posts timeline → Contact form) if it isn't already on screen, then scrolls to that section. It deliberately doesn't re-render when already home, so the timeline direction and half-typed form survive nav clicks.
-- `#play` → `Moinkey.page()` then `Moinkey.mount()`, both from `game.js` (see Moinkey below)
+- `#games` → `Moinkey.page()` then `Moinkey.mount()`, both from `game.js` (see Moinkey below)
 - `#project/<slug>` → `projectPage(post)`, then `loadMarkdown(post)` fetches and renders the markdown asynchronously
 - unknown slug → inline 404 markup
 

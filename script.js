@@ -610,7 +610,7 @@ async function renderRoute() {
     return;
   }
 
-  if (hash === 'play') {
+  if (hash === 'games') {
     // The puzzle lives in game.js, which loads before this file.
     app.innerHTML = Moinkey.page();
     Moinkey.mount();

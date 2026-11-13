@@ -1,6 +1,6 @@
 'use strict';
 
-// Moinkey (route #play): a 6×6 logic puzzle played with pigs and monkeys.
+// Moinkey (route #games): a 6×6 logic puzzle played with pigs and monkeys.
 // Every cell ends up holding one or the other, such that
 //   - no three of the same sit side by side in a row or column,
 //   - every row and column has three pigs and three monkeys,
