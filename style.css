@@ -16,6 +16,12 @@
   --race-text: #c2410c;
   --on-race: #ffffff;
   --light-off: #e4e0d8;
+  --pig: #f4a9b8;
+  --pig-deep: #e27f98;
+  --monkey: #94633f;
+  --monkey-face: #ecd0a8;
+  --piece-ink: #3a2a26;
+  --given: #f0eee9;
   --error: #b42318;
   --card-shadow: 0 12px 32px rgba(25, 21, 16, 0.08);
   --radius-xl: 22px;
@@ -44,6 +50,12 @@
   --race-text: #ff7a45;
   --on-race: #111111;
   --light-off: #2c2a27;
+  --pig: #f0a3b3;
+  --pig-deep: #d6708a;
+  --monkey: #a87650;
+  --monkey-face: #ecd0a8;
+  --piece-ink: #2b1f1c;
+  --given: #262523;
   --error: #ff8a80;
   --card-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
 }
@@ -944,8 +956,319 @@ textarea:focus-visible {
   stroke-width: 2.4;
 }
 
+/* ---------------------------------------------------------------------------
+   Moinkey (#play): markup and logic live in game.js
+   --------------------------------------------------------------------------- */
+
+.game-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 28px;
+  padding: 16px 0 40px;
+}
+
+.game-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.game-head h1 {
+  margin: 0;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.02;
+}
+
+.game-sub {
+  margin: 10px 0 0;
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
+.mk-modes,
+.mk-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.mk-modes .pill-button[aria-pressed='true'] {
+  border-color: var(--text);
+  background: var(--text);
+  color: var(--bg);
+}
+
+.pill-button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.pill-button:disabled:hover {
+  border-color: var(--border-strong);
+}
+
+.game-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 420px) minmax(0, 1fr);
+  align-items: start;
+  gap: 44px;
+}
+
+.game-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 16px;
+}
+
+.mk-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.mk-count {
+  color: var(--soft);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.mk-timer {
+  font-family: var(--mono);
+  font-size: 1.05rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+/* No gaps between cells: the "=" / "×" links are placed by percentage on the
+   borders the cells share, which is only exact while the tracks are flush. */
+.mk-board {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  grid-template-rows: repeat(6, minmax(0, 1fr));
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--card-shadow);
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.mk-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mk-cell:nth-child(6n) {
+  border-right: 0;
+}
+
+.mk-cell:nth-child(n + 31) {
+  border-bottom: 0;
+}
+
+.mk-cell:focus-visible {
+  /* Inset, or the board's rounded clip would cut the ring off at the edges. */
+  outline-offset: -4px;
+}
+
+.mk-cell.is-given {
+  background: var(--given);
+  cursor: default;
+}
+
+.mk-board.is-solved .mk-cell {
+  cursor: default;
+}
+
+.mk-cell.is-error {
+  background-image: repeating-linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--error) 26%, transparent) 0 5px,
+    transparent 5px 10px
+  );
+}
+
+.mk-cell.is-hint {
+  box-shadow: inset 0 0 0 3px var(--race);
+  animation: mk-hint 1.1s ease-in-out infinite alternate;
+}
+
+@keyframes mk-hint {
+  to {
+    box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--race) 35%, transparent);
+  }
+}
+
+.mk-piece {
+  display: block;
+  width: 74%;
+  aspect-ratio: 1;
+}
+
+.mk-piece svg,
+.mk-dot svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.mk-piece svg {
+  animation: mk-pop 0.16s ease-out both;
+}
+
+@keyframes mk-pop {
+  from {
+    scale: 0.4;
+    opacity: 0;
+  }
+}
+
+.mk-board.is-solved .mk-piece svg {
+  animation: mk-cheer 0.5s ease-out calc(var(--wave) * 55ms) both;
+}
+
+@keyframes mk-cheer {
+  40% {
+    scale: 1.2;
+    rotate: -8deg;
+  }
+}
+
+.pig-skin {
+  fill: var(--pig);
+}
+
+.pig-snout {
+  fill: var(--pig-deep);
+}
+
+.pig-ear {
+  fill: var(--pig-deep);
+  stroke: var(--pig-deep);
+  stroke-width: 2;
+  stroke-linejoin: round;
+}
+
+.monkey-fur {
+  fill: var(--monkey);
+}
+
+.monkey-face {
+  fill: var(--monkey-face);
+}
+
+.piece-ink {
+  fill: var(--piece-ink);
+}
+
+.piece-line {
+  fill: none;
+  stroke: var(--piece-ink);
+  stroke-width: 1.4;
+  stroke-linecap: round;
+}
+
+.mk-link,
+.mk-sign {
+  display: inline-grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1.5px solid var(--border-strong);
+  border-radius: 999px;
+  background: var(--card);
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.mk-link {
+  position: absolute;
+  translate: -50% -50%;
+  pointer-events: none;
+}
+
+.mk-link.is-error {
+  border-color: var(--error);
+  background: var(--error);
+  color: var(--bg);
+}
+
+.mk-message {
+  min-height: 3.1em;
+  margin: 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.game-side {
+  display: grid;
+  gap: 14px;
+}
+
+.game-side h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.mk-rules {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.mk-dot {
+  display: inline-block;
+  width: 1.35em;
+  height: 1.35em;
+  vertical-align: -0.34em;
+}
+
+.mk-sign {
+  vertical-align: 0.05em;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal {
+    animation: none;
+  }
+
+
+  .mk-cell.is-hint,
+  .mk-piece svg,
+  .mk-board.is-solved .mk-piece svg {
     animation: none;
   }
 
@@ -990,6 +1313,19 @@ textarea:focus-visible {
   .site-header {
     display: grid;
     align-items: start;
+  }
+
+  /* Board on top, rules underneath; the board stays a comfortable tap size
+     instead of stretching across a tablet. */
+  .game-layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .game-main {
+    width: 100%;
+    max-width: 440px;
+    margin: 0 auto;
   }
 }
 

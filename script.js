@@ -610,6 +610,14 @@ async function renderRoute() {
     return;
   }
 
+  if (hash === 'play') {
+    // The puzzle lives in game.js, which loads before this file.
+    app.innerHTML = Moinkey.page();
+    Moinkey.mount();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    return;
+  }
+
   if (hash.startsWith('project/')) {
     const slug = decodeURIComponent(hash.slice('project/'.length));
     const post = posts.find((item) => item.slug === slug);

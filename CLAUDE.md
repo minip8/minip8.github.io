@@ -21,6 +21,7 @@ Must be served over HTTP. Opening `index.html` via `file://` breaks post pages, 
 Single-page app with a hash router. `renderRoute()` in `script.js` reads `location.hash` and swaps `innerHTML` on `#app`:
 
 - `#home` (default), `#about`, `#posts`, `#contact` → `showHome(section)`: renders the one-page home (`homePage()`: About hero → Posts timeline → Contact form) if it isn't already on screen, then scrolls to that section. It deliberately doesn't re-render when already home, so the timeline direction and half-typed form survive nav clicks.
+- `#play` → `Moinkey.page()` then `Moinkey.mount()`, both from `game.js` (see Moinkey below)
 - `#project/<slug>` → `projectPage(post)`, then `loadMarkdown(post)` fetches and renders the markdown asynchronously
 - unknown slug → inline 404 markup
 
@@ -33,6 +34,15 @@ The Posts section lists posts chronologically (oldest first; "Reverse track" fli
 ### Contact form
 
 The form posts `FormData` to `https://minip8.com/api/contact`, a separate Cloudflare Worker in `contact-worker/` (Pages itself can't send email). The Worker emails the verified Gmail destination via Email Routing, only accepts the origins in `ALLOWED_ORIGINS` (prod + `http://localhost:8000`, so local testing must use port 8000), and silently drops submissions that fill the hidden `website` honeypot field. Deploy it with `cd contact-worker && npx wrangler deploy`; pushing the site does not deploy it.
+
+### Moinkey
+
+`game.js` is a self-contained IIFE that exposes only `window.Moinkey = { page, mount }`; its `<script defer>` tag must stay before `script.js`, which calls it from `renderRoute()`. It is a 6×6 logic puzzle of pigs and monkeys (inline SVG faces in `PIECE_SVG`, coloured by the `--pig*` / `--monkey*` / `--piece-ink` variables): no three alike in a line, three of each per row and column, and `=` / `×` links between neighbours.
+
+- Puzzles are generated in the browser by `generate(rand)`: a random solution, then clues are removed while `solvable()` (one-line-at-a-time deduction over `PATTERNS`) can still finish the grid. That is what guarantees one solution, no guessing, and that `findHint()` always has a next step. Don't swap in a backtracking uniqueness check without also changing the hints.
+- The daily puzzle is seeded from the local date, so any change to `generate()`, `randomSolution()`, `shuffle()` or `EDGE_POOL` changes that day's puzzle for everyone and invalidates progress saved under `localStorage['minip8-moinkey']` (`restore()` rejects a save whose fixed cells don't match). Random puzzles are never saved.
+- The `=` / `×` chips are positioned by percentage on shared cell borders, so `.mk-board` must keep zero grid gap and no padding.
+- `main#app` is `aria-live="polite"`, so `.game-page` sets `aria-live="off"` (the timer ticks every second) and only `#mk-message` (`role="status"`) is announced.
 
 ### Posts registry
 
